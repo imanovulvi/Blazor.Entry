@@ -1,0 +1,12 @@
+﻿@page "/login"
+@layout EmptyLayout
+@inherits LoginBase
+
+
+
+
+<EditForm Model="@request" OnValidSubmit="@UserLogin">
+    <InputText  placeholder="Email" @bind-Value="request.Email"  />
+    <InputText  placeholder="Password" @bind-Value="request.Password"  type="password" />
+    <button type="submit">Login</button>
+</EditForm>

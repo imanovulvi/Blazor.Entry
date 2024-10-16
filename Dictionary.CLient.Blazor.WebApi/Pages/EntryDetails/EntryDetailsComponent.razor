@@ -1,0 +1,28 @@
+﻿@page "/entryDetails/{id:int}"
+@using Dictionary.Common.DTOs.Queries.Entry.GetById
+
+<h4>@entry.Subject</h4>
+<p>@entry.Content</p>
+
+<GetEntryCommentComponent Id="@Id"></GetEntryCommentComponent>
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+    [Inject]
+    public IHttpService client { get; set; }
+
+    public GetEntryByIdQueryResponse entry { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetEntrysAsync(Id);
+    }
+
+    public async Task GetEntrysAsync(int id)
+    {
+        entry = await client.GetAsync<GetEntryByIdQueryResponse>($"https://localhost:7155/api/Entry/GetEntryById?Id={id}");
+   
+    }
+}

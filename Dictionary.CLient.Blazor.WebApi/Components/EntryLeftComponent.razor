@@ -1,0 +1,29 @@
+﻿
+@using Dictionary.Common.DTOs.Queries.Entry.GetLeft
+
+    <ul>
+    @foreach (var item in entrys)
+    {
+        <li><a href="#">@item.Subject<i style="color:red;"> - @item.CountComment</i></a></li>
+
+    }
+    </ul>
+
+
+@code {
+    
+    [Inject]
+    public IHttpService client { get; set; }
+
+    public List<GetEntryQueryResponse> entrys { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetEntryLeftAsync();
+    }
+
+    public async Task GetEntryLeftAsync()
+    {
+        entrys = await client.PostAsync<GetEntrysQueryRequest, List<GetEntryQueryResponse>>("https://localhost:7155/api/Entry/GetEntryLeft", new GetEntrysQueryRequest { Count = 10, Today = false });
+    }
+}

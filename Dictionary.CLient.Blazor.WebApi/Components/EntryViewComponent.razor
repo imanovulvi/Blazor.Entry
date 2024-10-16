@@ -1,0 +1,54 @@
+﻿@using Dictionary.Common.DTOs.Queries.Entry.Get
+@using System.Security.Claims
+
+@foreach (var item in entry.GetEntryContent)
+{
+
+    <h4><a href="/entryDetails/@item.Id">@item.Subject</a></h4>
+    <p>@item.Content</p>
+  
+    <EntryFavComponent EntryId="item.Id" UserId="@LoginUserId" IsFav="item.IsFavorite" GetList="async ()=>await GetEntrysAsync(entry.PageInfo.CurrenPage,5)"></EntryFavComponent>
+    <br /><br />
+    <EntryVoteComponent UserId="@LoginUserId" EntryId="@item.Id" UpVoteCount="@item.UpCountVotes" DownVoteCount="@item.DownCountVotes" IsYourVoteType="@item.IsYourVoteType" GetList="async ()=>await GetEntrysAsync(entry.PageInfo.CurrenPage,5)"></EntryVoteComponent>
+    <hr />
+}
+<br />
+<br />
+<nav aria-label="Page navigation example">
+    <ul class="pagination">
+        @for (int i = 0; i < entry.PageInfo.PageCount; i++)
+        {
+            int currenPage = i + 1;
+            <li class="page-item"><a @onclick="async ()=>await GetEntrysAsync(currenPage,5)" class="page-link" href="#">@currenPage</a></li>
+        }
+
+    </ul>
+</nav>
+
+@code {
+    public int LoginUserId { get; set; } = 0;
+    [Inject]
+    public AuthenticationStateProvider authenticationStateProvider { get; set; }
+
+    [Inject]
+    public IHttpService client { get; set; }
+    public GetEntryContentQueryResponse entry { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+       var user= (await (authenticationStateProvider as AuthProvider).GetAuthenticationStateAsync()).User;
+        if (user.Identity.IsAuthenticated)
+        {
+            LoginUserId = Convert.ToInt32(user.FindFirst(c => c.Type == System.Security.Claims.ClaimTypes.NameIdentifier).Value);
+        }
+
+            
+
+        await GetEntrysAsync(1, 5);
+    }
+
+    public async Task GetEntrysAsync(int page,int pageSize)
+    {
+        entry = await client.GetAsync<GetEntryContentQueryResponse>($"https://localhost:7155/api/Entry/GetEntry?Page={page}&PageSize={pageSize}&UserId={LoginUserId}");
+        StateHasChanged();
+    }
+}

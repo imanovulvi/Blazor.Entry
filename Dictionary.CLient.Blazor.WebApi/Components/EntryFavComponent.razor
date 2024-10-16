@@ -1,0 +1,43 @@
+﻿@using Dictionary.Common.DTOs.Commands.Entry.CreateFav
+
+@if(IsFav&& UserId!=0)
+{
+    <button type="button" class="btn btn-danger" @onclick="AddFav">Dis Fav</button>
+     <span>   Your fav</span>
+}
+else if (!IsFav && UserId != 0)
+{
+    <button type="button" class="btn btn-success" @onclick="AddFav">Add Fav</button>
+}
+
+@code {
+    [Parameter]
+    public int UserId { get; set; }
+    [Parameter]
+    public int EntryId { get; set; }
+    [Parameter]
+    public bool IsFav { get; set; }
+
+    [Inject]
+    public IHttpService client { get; set; }
+
+
+
+    public async Task AddFav()
+    {
+
+        if (!IsFav)
+        {
+            await client.PostAsync<EntryFavCreateCommandRequest, object>("https://localhost:7155/api/Entry/CreateFav", new EntryFavCreateCommandRequest { EntryId = EntryId, UserId = UserId });
+        }
+        else
+        {
+            await client.DeleteAsync("https://localhost:7155/api/Entry/UserDeleteFav", new { EntryId = EntryId, UserId = UserId });
+        }
+      await GetList.InvokeAsync();
+    }
+
+    [Parameter]
+    public EventCallback GetList { get; set; }
+
+}

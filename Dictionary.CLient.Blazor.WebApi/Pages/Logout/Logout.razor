@@ -1,0 +1,19 @@
+﻿
+@page "/logout"
+
+
+@code {
+    [Inject]
+    public NavigationManager navigationManager { get; set; }
+    [Inject]
+    private ILocalStorageService localStorage { get; set; }
+    [Inject]
+    public AuthenticationStateProvider authenticationStateProvider { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await (authenticationStateProvider as AuthProvider).NotfyLogoutAsync();
+        navigationManager.NavigateTo("/login");
+    }
+
+}

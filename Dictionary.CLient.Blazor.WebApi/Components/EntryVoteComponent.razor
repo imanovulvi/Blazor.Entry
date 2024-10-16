@@ -1,0 +1,58 @@
+﻿@using Dictionary.Common.DTOs.Commands.Entry.CreateVote
+@if (IsYourVoteType==1)
+{
+    <button type="button" class="btn btn-primary" @onclick="()=>Vote(0)">boy (@UpVoteCount)</button>
+}
+else if(IsYourVoteType==-1)
+{
+    <button type="button" class="btn btn-danger" @onclick="()=>Vote(0)">kic (@DownVoteCount)</button>
+}
+else
+{
+    <button type="button" class="btn btn-light" @onclick="()=>Vote(1)">boy (@UpVoteCount)</button>
+    <button type="button" class="btn btn-light" @onclick="()=>Vote(-1)">kic (@DownVoteCount)</button>
+}
+
+
+
+
+@code {
+    [Inject]
+    public IHttpService client { get; set; }
+    [Parameter]
+    public int EntryId { get; set; }
+    [Parameter]
+    public int UserId { get; set; }
+
+    [Parameter]
+    public int UpVoteCount { get; set; }   
+    [Parameter]
+    public int IsYourVoteType { get; set; }   
+    [Parameter]
+    public int DownVoteCount { get; set; }
+    [Parameter]
+    public EventCallback GetList { get; set; }
+
+    public async Task Vote(int vot)
+    {
+        EntryVoteCreateCommandReuqest request = new EntryVoteCreateCommandReuqest
+            {
+                VoteType = (VoteType)vot,
+                EntryId = EntryId,
+                UserId = UserId
+            };
+
+        if (vot == 0)
+        {
+          await   client.DeleteAsync("https://localhost:7155/api/Entry/DeleteVote", new { UserId = UserId, EntryId = EntryId });
+        }
+        else
+        {
+
+            await client.PostAsync<EntryVoteCreateCommandReuqest, object>("https://localhost:7155/api/Entry/CreateVote", request);
+        }
+        await   GetList.InvokeAsync();
+
+    }
+
+}

@@ -1,0 +1,51 @@
+﻿@using Dictionary.Common.DTOs.Commands.EntryComment.Create
+@using Dictionary.Common.DTOs.Queries.EntryComment.GetEntryComment
+
+<textarea @bind="@Comment"></textarea>
+<button @onclick="AddComment">Add Comment</button>
+
+<br />
+<br />
+@foreach (var item in comments)
+{
+
+    <b>@item.User.Name</b>
+    <p>@item.Content</p>
+<i>@item.CreateDate</i>
+<hr />
+}
+
+
+
+@code {
+
+    public string Comment { get; set; }
+
+    [Parameter]
+    public int Id { get; set; }
+
+
+    [Inject]
+    protected IHttpService httpService { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetEntryCommentsAsync(Id);
+    }
+    public List<GetEntryCommentQueryResponse> comments { get; set; }
+
+    protected async Task GetEntryCommentsAsync(int id)
+    {
+        comments= await httpService.GetAsync<List<GetEntryCommentQueryResponse>>($"https://localhost:7155/api/EntryComment/GetCommentsEntryById?EntryId={id}");
+
+    }
+
+
+    protected async Task AddComment()
+    {
+        await httpService.PostAsync<EntryCommentCommandRequest, EntryCommentCommandResponse>($"https://localhost:7155/api/EntryComment/Create",new EntryCommentCommandRequest{Content=Comment,EntryId=Id,UserId=1});
+       await  OnInitializedAsync();
+    }
+
+}
+

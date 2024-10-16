@@ -1,0 +1,12 @@
+﻿ ul {
+    list-style: none;
+}
+
+ ul li {
+        margin-bottom: 10px;
+    }
+
+ul li a {
+            color: white;
+            text-decoration: none;
+        }

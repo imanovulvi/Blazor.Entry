@@ -1,0 +1,105 @@
+﻿@using Dictionary.Common.DTOs.Queries.Entry.Search
+@using Microsoft.AspNetCore.Components.Authorization
+
+@inherits LayoutComponentBase
+
+
+    <header>
+
+    <div style="color:white;margin:0 auto;">
+
+        <div class="row">
+            <div class="col-4">Sozluk</div>
+            <div class="col-4">
+                <div>
+                    <input type="text" @bind="Search" @onkeydown="Enter" @onfocusout="HideSearchResults" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Search">
+
+
+                    @if (showResults)
+                    {
+                        @if (entryes is not null)
+                        {
+                            <div style="position:absolute; border:1px solid #ccc; background-color:#333; width:auto;padding:10px;">
+                                <ul style="list-style:none;">
+                                    @foreach (var item in entryes)
+                                    {
+                                        <li style="margin-bottom:10px;">
+                                            <a style="color:white;text-decoration:none;" href="#">@item.Subject</a>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+                    }
+
+                </div>
+
+
+            </div>
+            <div class="col-4">
+                <AuthorizeView>
+                    <Authorized>
+                        <NavLink href="/logout" class="nav-link">Logout</NavLink>
+
+                    </Authorized>
+                    <NotAuthorized>
+                        <NavLink href="/login" class="nav-link">Login</NavLink>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </div>
+            <div class="col-4">
+        
+            </div>
+        </div>
+
+        </div>
+
+    </header>
+
+
+    <div class="container">
+        <div class="sidebar">
+        <button type="button" @onclick="@Refresh" class="btn btn-warning">Refresh</button><br />
+   
+            <EntryLeftComponent @ref="@entrLeft"></EntryLeftComponent>
+
+        </div>
+
+        <div class="content">
+            @Body
+
+
+
+          
+        </div>
+    </div>
+
+
+
+
+
+@code {
+    public string Search { get; set; }
+    List<EntrySearchQueryResponse> entryes;
+    [Inject]
+    public IHttpService client { get; set; }
+    public EntryLeftComponent entrLeft;
+    public bool showResults { get; set; } = false;
+    public async Task Refresh()
+    {
+        await entrLeft.GetEntryLeftAsync();
+    }
+
+    public async Task Enter(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            entryes = await client.PostAsync<EntrySearchQueryRequest, List<EntrySearchQueryResponse>>("https://localhost:7155/api/Entry/GetEntrySearch", new EntrySearchQueryRequest { SerachText = Search });
+            showResults = true;
+        }
+    }
+    private void HideSearchResults(FocusEventArgs e)
+    {
+        showResults = false; // Div-i gizlətmək
+    }
+}
