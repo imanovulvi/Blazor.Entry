@@ -46,6 +46,17 @@ public class HttpService : IHttpService
             result = JsonConvert.DeserializeObject<TResult>(await response.Content.ReadAsStringAsync());
         return result;
     }
+    public async Task<bool> PutAsync<T>(string url, T request)
+       where T : class
+     
+    {
+
+        StringContent stringContent = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
+        HttpResponseMessage response = await client.PutAsync(url, stringContent);
+
+        return response.IsSuccessStatusCode;
+         
+    }
     public async Task<bool> DeleteAsync<T>(string url, T request)
        where T : class
     {

@@ -11,5 +11,6 @@ namespace Dictionary.CLient.Blazor.WebApi.Infrastructure
         Task<TResult> PutAsync<T, TResult>(string url, T request)
             where T : class
             where TResult : class;
+        Task<bool> PutAsync<T>(string url, T request) where T : class;
     }
 }
